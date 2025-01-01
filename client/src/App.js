@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import Customer from './components/Customer';
 import './App.css';
 import Paper from '@material-ui/core/Paper';
@@ -18,56 +18,67 @@ const styles = {
   table: {
     minWidth: 1080
   }
-}
+};
 
-const customers = [
-  {
-    'id': 1,
-    'image': 'https://picsum.photos/64/64?random=1',
-    'name': '티모',
-    'birthday': '961222',
-    'gender': '남자',
-    'job': '대학생'
-  },
-  {
-    'id': 2,
-    'image': 'https://picsum.photos/64/64?random=2',
-    'name': '케이틀린',
-    'birthday': '970412',
-    'gender': '여자',
-    'job': '원딜러'
-  },
-  {
-    'id': 3,
-    'image': 'https://picsum.photos/64/64?random=3',
-    'name': '바이',
-    'birthday': '950521',
-    'gender': '여자',
-    'job': '정글러'
+class App extends Component {
+  state = {
+    customers: ""
+  };
+
+  componentDidMount() {
+    this.callApi()
+      .then(res => this.setState({ customers: res }))
+      .catch(err => console.log(err));
   }
-]
 
-function App() {
+  callApi = async () => {
+    const response = await fetch('/api/customers');
+    const body = await response.json();
+    return body;
+  };
 
-  return (
-    <Paper className={styles.root}>
-      <Table className={styles.table}>
-        <TableHead>
-          <TableRow>
-            <TableCell>번호</TableCell>
-            <TableCell>이미지</TableCell>
-            <TableCell>이름</TableCell>
-            <TableCell>생년월일</TableCell>
-            <TableCell>성별</TableCell>
-            <TableCell>직업</TableCell>
-          </TableRow>
-        </TableHead>
-        <TableBody>
-          {customers.map(c => { return ( <Customer key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job} /> ); }) }
-        </TableBody>
-      </Table>
-    </Paper>
-  );
+  render() {
+    const { classes } = this.props;
+    return (
+      <Paper className={classes.root}>
+        <Table className={classes.table}>
+          <TableHead>
+            <TableRow>
+              <TableCell>번호</TableCell>
+              <TableCell>이미지</TableCell>
+              <TableCell>이름</TableCell>
+              <TableCell>생년월일</TableCell>
+              <TableCell>성별</TableCell>
+              <TableCell>직업</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {this.state.customers.length > 0 ? (
+              this.state.customers.map(c => {
+                return (
+                  <Customer
+                    key={c.id}
+                    id={c.id}
+                    image={c.image}
+                    name={c.name}
+                    birthday={c.birthday}
+                    gender={c.gender}
+                    job={c.job}
+                  />
+                );
+              })
+            ) : (
+              <TableRow>
+                <TableCell colSpan={6} align="center">
+                  데이터가 없습니다.
+                </TableCell>
+              </TableRow>
+            )}
+          </TableBody>
+        </Table>
+      </Paper>
+    );
+  }
 }
 
 export default withStyles(styles)(App);

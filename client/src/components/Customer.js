@@ -4,16 +4,14 @@ import TableCell from '@material-ui/core/TableCell';
 
 function Customer(props) {
     return (
-        <div>
-            <TableRow>
-                <TableCell>{props.id}</TableCell> 
-                <TableCell><img src={props.image} alt="profile"/></TableCell> 
-                <TableCell>{props.name}</TableCell> 
-                <TableCell>{props.birthday}</TableCell> 
-                <TableCell>{props.gender}</TableCell> 
-                <TableCell>{props.job}</TableCell> 
-            </TableRow>
-        </div>
+        <TableRow>
+            <TableCell>{props.id}</TableCell> 
+            <TableCell><img src={props.image} alt="profile"/></TableCell> 
+            <TableCell>{props.name}</TableCell> 
+            <TableCell>{props.birthday}</TableCell> 
+            <TableCell>{props.gender}</TableCell> 
+            <TableCell>{props.job}</TableCell> 
+        </TableRow>
     );
 }
 
