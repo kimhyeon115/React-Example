@@ -1,84 +1,57 @@
-import React, { Component } from 'react';
-import Customer from './components/Customer';
-import './App.css';
-import Paper from '@material-ui/core/Paper';
-import Table from '@material-ui/core/Table';
-import TableHead from '@material-ui/core/TableHead';
-import TableBody from '@material-ui/core/TableBody';
-import TableRow from '@material-ui/core/TableRow';
-import TableCell from '@material-ui/core/TableCell';
-import CircularProgress from '@material-ui/core/CircularProgress';
-import { withStyles } from '@material-ui/core/styles';
+import React, { useState, useEffect } from "react";
+import axios from "axios";
+import { Container, Row, Col, Card, Button } from "react-bootstrap";
+import "bootstrap/dist/css/bootstrap.min.css";
 
-const styles = theme => ({
-  root: {
-    width: '100%',
-    // marginTop: theme.spacing.unit * 3,
-    overflowX: "auto"
-  },
-  table: {
-    minWidth: 1080
-  },
-  progress: {
-    // margin: theme.spacing.unit * 2
-  }
-});
+function App() {
+  const [products, setProducts] = useState([]);
+  const [userInfo, setUserInfo] = useState(null);
 
-class App extends Component {
-  state = {
-    customers: "",
-    completed: 0
-  };
+  // 사용자 정보 API 호출
+  useEffect(() => {
+    axios
+      .get("http://localhost:5000/api/user")
+      .then((response) => setUserInfo(response.data))
+      .catch((error) => console.error("Error fetching user info:", error));
+  }, []);
 
-  componentDidMount() {
-    this.timer = setInterval(this.process, 20);
-    this.callApi()
-      .then(res => this.setState({ customers: res }))
-      .catch(err => console.log(err));
-  }
+  // 제품 목록 API 호출 (더미 데이터)
+  useEffect(() => {
+    axios
+      .get("https://fakestoreapi.com/products")
+      .then((response) => setProducts(response.data))
+      .catch((error) => console.error("Error fetching products:", error));
+  }, []);
 
-  callApi = async () => {
-    const response = await fetch('/api/customers');
-    const body = await response.json();
-    return body;
-  };
-
-  progress = () => {
-    const { completed } = this.state;
-    this.setState({ completed: completed >= 100 ? 0 : completed + 1});
-  }
-
-  render() {
-    const { classes } = this.props;
-    return (
-      <Paper className={classes.root}>
-        <Table className={classes.table}>
-          <TableHead>
-            <TableRow>
-              <TableCell>번호</TableCell>
-              <TableCell>이미지</TableCell>
-              <TableCell>이름</TableCell>
-              <TableCell>생년월일</TableCell>
-              <TableCell>성별</TableCell>
-              <TableCell>직업</TableCell>
-            </TableRow>
-          </TableHead>
-          <TableBody>
-            {this.state.customers ? this.state.customers.map(c => {
-                return ( <Customer key={c.id} id={c.id} image={c.image} name={c.name} birthday={c.birthday} gender={c.gender} job={c.job} /> );
-              }) :
-              /* 로딩 애니메이션 표현 안됨 */
-              <TableRow>
-                <TableCell colSpan="6" align="center">
-                  <CircularProgress className={classes.progress} variant="determinate" value={this.state.completed} />
-                </TableCell>
-              </TableRow>
-            }
-          </TableBody>
-        </Table>
-      </Paper>
-    );
-  }
+  return (
+    <Container>
+      <Row className="mt-5">
+        <Col>
+          <h1>Welcome to the Simple Shop</h1>
+          {userInfo && <p>Logged in as: {userInfo.name}</p>}
+        </Col>
+      </Row>
+      <Row>
+        {products.map((product) => (
+          <Col key={product.id} sm={12} md={4} lg={3} className="mb-4">
+            <Card>
+              <Card.Img
+                variant="top"
+                src={product.image}
+                alt={product.title}
+                style={{ height: "200px", objectFit: "cover" }}
+              />
+              <Card.Body>
+                <Card.Title>{product.title}</Card.Title>
+                <Card.Text>{product.description}</Card.Text>
+                <Button variant="primary">Add to Cart</Button>
+              </Card.Body>
+            </Card>
+          </Col>
+        ))}
+      </Row>
+    </Container>
+  );
 }
 
-export default withStyles(styles)(App);
+export default App;
